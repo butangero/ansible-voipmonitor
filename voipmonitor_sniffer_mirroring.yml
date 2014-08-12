@@ -1,0 +1,8 @@
+---
+# ansible-playbook -k -l $host main.yml
+- hosts:
+    - all
+  vars:
+    - voipmonitor_mirror_server_ip: '127.0.0.1' #CHANGETHIS
+  roles:
+    - bonk.voipmonitor

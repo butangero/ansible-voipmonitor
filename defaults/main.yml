@@ -1,0 +1,5 @@
+---
+# file: defaults/main.yml
+voipmonitor_sniffer_reinstall: false
+voipmonitor_sniffer_id: 1
+voipmonitor_sshfs_user: voipmonitor

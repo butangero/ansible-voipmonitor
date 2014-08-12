@@ -1,0 +1,26 @@
+# {{ ansible_managed }}
+#
+# voipmonitor.org configuration file
+#
+# location of this file is at ~/.voipmonitor.conf or /etc/voipmonitor.conf
+# command line parameters overrides configuration directives in this file
+# allowed comments are ; or #.
+#
+
+[general]
+
+# in case of running more voipmonitor instances on the same or another servers configured to save to one database and the same cdr table
+# it is possible to differentiate CDR by id_sensor column. If you set id_sensor >= 0 the number will be saved in cdr.id_sensor column.
+# The number is between 1 - 65535 (16bit number)
+
+id_sensor = {{ voipmonitor_sniffer_id }}
+
+interface = eth1
+ringbuffer = 200 #up to 2000MB
+packetbuffer_enable             = yes
+packetbuffer_total_maxheap      = 2000 #in MB
+packetbuffer_compress           = yes #enable compression
+packetbuffer_file_totalmaxsize  = 0 #MB. Default is disabled.
+packetbuffer_file_path          = /var/spool/voipmonitor/packetbuffer
+mirror_destination_ip           = {{ voipmonitor_mirror_server_ip }}
+mirror_destination_port         = 5030

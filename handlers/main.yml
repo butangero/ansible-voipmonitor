@@ -1,0 +1,10 @@
+---
+# file: handlers/main.yml
+
+- name: restart voipmonitor
+  sudo: yes
+  command:  service voipmonitor restart
+
+- name: mount voipmonitor
+  sudo: yes
+  command:  mount /mnt/voipmonitor

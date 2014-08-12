@@ -1,0 +1,82 @@
+---
+  # file: tasks/sniffer_mirroring.yml
+
+  - name: Install dependecy packages
+    sudo: yes
+    apt: pkg={{ item }}
+       state=present
+    with_items:
+    - tshark
+    - wget
+    - mtr
+    - sshfs
+    tags: install_pkg
+
+  - name: Reinstall sniffer show
+    debug: msg='{{ voipmonitor_sniffer_reinstall }}'
+
+  - name: Reinstall sniffer
+    shell: rm -r /usr/src/voipmonitor*
+    when: voipmonitor_sniffer_reinstall
+
+  - name: Check sources exists
+    shell: test -d /usr/src/voipmonitor
+    ignore_errors: yes
+    register: src_dir
+
+  - name: Download Voipmonitor
+    shell: creates=/usr/src/voipmonitor.tar.gz wget -O - http://www.voipmonitor.org/current-stable-sniffer-static-64bit.tar.gz | tar -xz -C /usr/src/
+    sudo: yes
+    when: src_dir.rc == 1
+    tags: install_pkg
+
+  - name: mv Voipmonitor
+    shell: mv /usr/src/voipmonitor* /usr/src/voipmonitor
+    sudo: yes
+    when: src_dir.rc == 1
+    tags: install_pkg
+
+  - name: Dont ask about overwrite /etc/voipmonitor.conf
+    shell: sed -i 's/^cp -i/cp/g' /usr/src/voipmonitor/install-script.sh
+    sudo: yes
+    when: src_dir.rc == 1
+    tags: install_pkg
+
+  - name: Create directory for packetbuffer
+    sudo: yes
+    file: path=/var/spool/voipmonitor/packetbuffer state=directory
+    tags: install_pkg
+
+  - name: Install Voipmonitor
+    command: chdir=/usr/src/voipmonitor ./install-script.sh
+    sudo: yes
+    when: src_dir.rc == 1
+    tags: install_pkg
+
+  - name: Create config file
+    sudo: yes
+    template: src=etc/voipmonitor.conf.j2
+            dest=/etc/voipmonitor.conf
+            mode=0644 owner=root group=root
+            backup=yes
+    notify: restart voipmonitor
+    tags: configure
+
+  - name: Copy ssh key
+    sudo: yes
+    copy: src=root/id_rsa_voipmonitor
+            dest=/root/id_rsa_voipmonitor
+            mode=0600 owner=root group=root
+    tags: configure
+
+  - name: Create directory for mountpoint
+    sudo: yes
+    file: path=/mnt/voipmonitor state=directory
+    tags: configure
+
+  - name: Add sshfs to fstab
+    sudo: yes
+    lineinfile: dest=/etc/fstab line="{{voipmonitor_sshfs_user}}@{{voipmonitor_mirror_server_ip}}:/var/spool/voipmonitor /mnt/voipmonitor fuse.sshfs  defaults,_netdev,IdentityFile=/root/id_rsa_voipmonitor  0  0"
+            backup=yes
+    notify: mount voipmonitor
+    tags: configure

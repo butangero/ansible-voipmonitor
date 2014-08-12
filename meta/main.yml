@@ -1,0 +1,16 @@
+---
+galaxy_info:
+  author: Piotr Bak
+  description:
+  company: PB Piotr Bak
+  license: MIT
+  min_ansible_version: 1.6
+  platforms:
+  - name: Ubuntu
+    versions:
+    - precise
+    - trusty
+  categories:
+  - monitoring
+  - networking
+dependencies: []

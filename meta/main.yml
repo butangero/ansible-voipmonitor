@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Piotr Bak
-  description:
+  description: Ansible playbook for voipmonitor
   company: PB Piotr Bak
   license: MIT
   min_ansible_version: 1.6

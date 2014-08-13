@@ -1,7 +1,7 @@
 ---
   # file: tasks/sniffer_mirroring.yml
 
-  - name: Install dependecy packages
+  - name: Install dependecy packages [Debian]
     sudo: yes
     apt: pkg={{ item }}
        state=present
@@ -10,6 +10,34 @@
     - wget
     - mtr
     - sshfs
+    when: ansible_os_family == 'Debian'
+    tags: install_pkg
+
+  - name: epel install [RedHat]
+    shell: rpm -Uvh http://dl.fedoraproject.org/pub/epel/{{ ansible_distribution_major_version }}/{{ ansible_machine }}/epel-release-6-8.noarch.rpm
+    when: ansible_os_family == 'RedHat'
+    ignore_errors: yes
+    tags: install_pkg
+
+  - name: epel enable [RedHat]
+    ini_file: dest=/etc/yum.repos.d/epel.repo
+            section=epel
+            option=enabled
+            value=1
+    when: ansible_os_family == 'RedHat'
+    tags: install_pkg
+
+  - name: Install dependecy packages [RedHat]
+    sudo: yes
+    yum: pkg={{ item }}
+       state=present
+    with_items:
+    - wireshark
+    - wget
+    - mtr
+    - fuse
+    - sshfs
+    when: ansible_os_family == 'RedHat'
     tags: install_pkg
 
   - name: Reinstall sniffer show

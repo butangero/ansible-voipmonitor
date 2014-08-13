@@ -11,6 +11,9 @@ galaxy_info:
     - oneiric
     - precise
     - trusty
+  - name: EL
+    versions:
+    - 6
   categories:
   - monitoring
   - networking
